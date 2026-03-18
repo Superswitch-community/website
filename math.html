@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Exam Page</title>
+<script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-900 text-white flex items-center justify-center min-h-screen">
+
+<div class="w-full max-w-2xl bg-gray-800 p-6 rounded-2xl shadow-lg">
+
+  <!-- HEADER -->
+  <div class="flex justify-between items-center mb-4">
+    <h1 class="text-xl font-bold">Math Exam</h1>
+    <div id="timer" class="bg-red-500 px-4 py-1 rounded-lg">60</div>
+  </div>
+
+  <!-- QUESTION -->
+  <div id="question" class="text-lg mb-4">Loading...</div>
+
+  <!-- OPTIONS -->
+  <div id="options" class="space-y-2"></div>
+
+  <!-- NAV BUTTONS -->
+  <div class="flex justify-between mt-6">
+    <button onclick="prevQuestion()" class="bg-gray-600 px-4 py-2 rounded">Previous</button>
+    <button onclick="nextQuestion()" class="bg-blue-600 px-4 py-2 rounded">Next</button>
+  </div>
+
+</div>
+
+<script>
+let questions = [];
+let currentIndex = 0;
+let answers = [];
+let timeLeft = 60;
+let timer;
+
+// Fetch Questions
+async function loadQuestions() {
+  let res = await fetch("https://opentdb.com/api.php?amount=10&category=19&type=multiple");
+  let data = await res.json();
+  questions = data.results;
+  showQuestion();
+  startTimer();
+}
+
+// Show Question
+function showQuestion() {
+  let q = questions[currentIndex];
+  let questionEl = document.getElementById("question");
+  let optionsEl = document.getElementById("options");
+
+  questionEl.innerHTML = decodeHTML(q.question);
+
+  let options = [...q.incorrect_answers, q.correct_answer];
+  options.sort(() => Math.random() - 0.5);
+
+  optionsEl.innerHTML = "";
+
+  options.forEach(opt => {
+    let btn = document.createElement("button");
+    btn.className = "w-full bg-gray-700 p-2 rounded hover:bg-gray-600";
+    btn.innerHTML = decodeHTML(opt);
+
+    btn.onclick = () => {
+      answers[currentIndex] = opt;
+      showQuestion();
+    };
+
+    if (answers[currentIndex] === opt) {
+      btn.classList.add("bg-green-600");
+    }
+
+    optionsEl.appendChild(btn);
+  });
+}
+
+// Decode HTML entities
+function decodeHTML(html) {
+  let txt = document.createElement("textarea");
+  txt.innerHTML = html;
+  return txt.value;
+}
+
+// Next
+function nextQuestion() {
+  if (currentIndex < questions.length - 1) {
+    currentIndex++;
+    showQuestion();
+  } else {
+    finishExam();
+  }
+}
+
+// Previous
+function prevQuestion() {
+  if (currentIndex > 0) {
+    currentIndex--;
+    showQuestion();
+  }
+}
+
+// Timer
+function startTimer() {
+  timer = setInterval(() => {
+    timeLeft--;
+    document.getElementById("timer").innerText = timeLeft;
+
+    if (timeLeft <= 0) {
+      clearInterval(timer);
+      finishExam();
+    }
+  }, 1000);
+}
+
+// Finish Exam
+function finishExam() {
+  clearInterval(timer);
+
+  let score = 0;
+  questions.forEach((q, i) => {
+    if (answers[i] === q.correct_answer) {
+      score++;
+    }
+  });
+
+  document.body.innerHTML = `
+    <div class="flex items-center justify-center min-h-screen bg-gray-900 text-white">
+      <div class="bg-gray-800 p-6 rounded-xl text-center">
+        <h1 class="text-2xl mb-4">Exam Finished</h1>
+        <p class="text-lg">Score: ${score} / ${questions.length}</p>
+      </div>
+    </div>
+  `;
+}
+
+// Init
+loadQuestions();
+</script>
+
+</body>
+  </html>
