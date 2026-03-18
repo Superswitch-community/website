@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Math Genius | Pro Access</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #0f172a; color: #f1f5f9; }
+        .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); }
+        .hidden-screen { display: none; }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4">
+
+    <!-- SCREEN 1: PAYMENT/LANDING -->
+    <div id="screen-payment" class="max-w-md w-full glass rounded-[2.5rem] p-10 text-center shadow-2xl">
+        <div class="w-20 h-20 bg-blue-500/20 rounded-3xl flex items-center justify-center mx-auto mb-6">
+            <i class="fa-solid fa-lock text-3xl text-blue-400"></i>
+        </div>
+        <h1 class="text-3xl font-extrabold mb-3">Math Masterclass</h1>
+        <p class="text-slate-400 mb-8">Unlock 10 premium hard-level mathematics challenges for just <span class="text-white font-bold">$0.00</span> (Virtual Demo).</p>
+        
+        <button onclick="simulatePayment()" id="pay-btn" class="w-full py-4 bg-blue-600 hover:bg-blue-500 rounded-2xl font-bold transition-all flex items-center justify-center gap-3">
+            <i class="fa-solid fa-credit-card"></i> Pay Virtually & Unlock
+        </button>
+        <p class="text-[10px] text-slate-500 mt-4 uppercase tracking-widest">Secure Virtual Transaction</p>
+    </div>
+
+    <!-- SCREEN 2: LOGIN -->
+    <div id="screen-login" class="max-w-md w-full glass rounded-[2.5rem] p-10 hidden-screen shadow-2xl">
+        <h2 class="text-2xl font-bold mb-2">Access Granted</h2>
+        <p class="text-slate-400 mb-8 text-sm">Please enter your details to start the session.</p>
+        
+        <div class="space-y-4">
+            <div>
+                <label class="text-xs font-bold text-slate-500 uppercase ml-1">Username</label>
+                <input type="text" id="username" placeholder="Enter name" class="w-full bg-slate-800/50 border border-slate-700 rounded-xl p-4 mt-1 focus:border-blue-500 outline-none transition-all">
+            </div>
+            <button onclick="handleLogin()" class="w-full py-4 bg-emerald-600 hover:bg-emerald-500 rounded-2xl font-bold mt-4 transition-all">
+                Enter Quiz Arena
+            </button>
+        </div>
+    </div>
+
+    <!-- SCREEN 3: THE QUIZ (Previously built) -->
+    <div id="screen-quiz" class="max-w-6xl w-full grid grid-cols-1 lg:grid-cols-12 gap-6 hidden-screen">
+        <!-- (Sidebar & Quiz Content remains same as before) -->
+        <div class="lg:col-span-3">
+            <div class="glass rounded-3xl p-6 h-full">
+                <h3 id="player-tag" class="text-sm font-bold uppercase text-blue-400 mb-6">Player: Guest</h3>
+                <div id="question-bank" class="grid grid-cols-5 gap-3"></div>
+            </div>
+        </div>
+        <div class="lg:col-span-9">
+            <div class="glass rounded-3xl p-8 relative overflow-hidden min-h-[400px]">
+                <div id="timer-bar" class="absolute top-0 left-0 h-1 bg-blue-500 transition-all linear" style="width: 100%"></div>
+                <div id="quiz-ui-content">
+                    <h2 id="question-text" class="text-2xl lg:text-3xl font-semibold mb-8">Loading Questions...</h2>
+                    <div id="options-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+                </div>
+                <div class="mt-10 flex justify-between items-center">
+                    <span class="text-slate-400">Score: <span id="current-score" class="text-white font-bold">0</span></span>
+                    <button id="next-btn" onclick="nextQuestion()" class="hidden px-8 py-3 bg-white text-black font-bold rounded-2xl">Next Question</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- NAVIGATION LOGIC ---
+        function simulatePayment() {
+            const btn = document.getElementById('pay-btn');
+            btn.innerHTML = '<i class="fa-solid fa-circle-notch animate-spin"></i> Processing...';
+            setTimeout(() => {
+                document.getElementById('screen-payment').classList.add('hidden-screen');
+                document.getElementById('screen-login').classList.remove('hidden-screen');
+            }, 1500);
+        }
+
+        function handleLogin() {
+            const user = document.getElementById('username').value || "Genius";
+            document.getElementById('player-tag').textContent = `Player: ${user}`;
+            document.getElementById('screen-login').classList.add('hidden-screen');
+            document.getElementById('screen-quiz').classList.remove('hidden-screen');
+            initQuiz(); // Start the actual trivia engine
+        }
+
+        // --- QUIZ ENGINE ---
+        let questions = [], currentIndex = 0, score = 0, timeLeft = 30, timerInterval;
+        const API_URL = "https://the-trivia-api.com";
+
+        async function initQuiz() {
+            const response = await fetch(API_URL);
+            questions = await response.json();
+            renderBank();
+            showQuestion();
+        }
+
+        function renderBank() {
+            const bank = document.getElementById('question-bank');
+            bank.innerHTML = questions.map((_, i) => `<div id="bank-dot-${i}" class="h-10 w-10 rounded-xl glass flex items-center justify-center text-xs font-bold border border-slate-700">${i+1}</div>`).join('');
+        }
+
+        function showQuestion() {
+            if (currentIndex >= 10) return finishQuiz();
+            const q = questions[currentIndex];
+            const opts = [...q.incorrectAnswers, q.correctAnswer].sort(() => Math.random() - 0.5);
+            
+            document.getElementById('question-text').textContent = q.question.text;
+            document.getElementById('options-grid').innerHTML = opts.map(o => `
+                <button class="option-btn p-5 rounded-2xl bg-slate-800/50 border border-slate-700 text-left hover:border-blue-500 transition-all" onclick="check('${o}', '${q.correctAnswer}', this)">${o}</button>
+            `).join('');
+            
+            document.getElementById(`bank-dot-${currentIndex}`).classList.add('border-blue-500', 'text-blue-400');
+            startTimer();
+        }
+
+        function startTimer() {
+            clearInterval(timerInterval);
+            timeLeft = 30;
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                document.getElementById('timer-text')?.textContent = `${timeLeft}s`;
+                document.getElementById('timer-bar').style.width = `${(timeLeft/30)*100}%`;
+                if(timeLeft <= 0) check(null, questions[currentIndex].correctAnswer, null);
+            }, 1000);
+        }
+
+        function check(selected, correct, btn) {
+            clearInterval(timerInterval);
+            document.querySelectorAll('.option-btn').forEach(b => b.disabled = true);
+            const dot = document.getElementById(`bank-dot-${currentIndex}`);
+            
+            if(selected === correct) {
+                btn?.classList.add('bg-emerald-500/20', 'border-emerald-500', 'text-emerald-400');
+                score += 10;
+                document.getElementById('current-score').textContent = score;
+                dot.classList.add('bg-emerald-500/20', 'text-emerald-400');
+            } else {
+                btn?.classList.add('bg-rose-500/20', 'border-rose-500', 'text-rose-400');
+                dot.classList.add('bg-rose-500/20', 'text-rose-400');
+            }
+            document.getElementById('next-btn').classList.remove('hidden');
+        }
+
+        function nextQuestion() {
+            currentIndex++;
+            document.getElementById('next-btn').classList.add('hidden');
+            showQuestion();
+        }
+
+        function finishQuiz() {
+            document.getElementById('quiz-ui-content').innerHTML = `<h2 class="text-4xl font-bold text-center py-20">Final Score: ${score}</h2>`;
+        }
+    </script>
+</body>
+</html>

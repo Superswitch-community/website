@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Naija Edu-Test Portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .bg-portal {
+            background: linear-gradient(rgba(0, 135, 81, 0.85), rgba(0, 60, 36, 0.95)), 
+                        url('https://images.pexels.com');
+            background-size: cover; background-position: center; background-attachment: fixed;
+        }
+        .option-card.selected { border-color: #059669; background-color: #ecfdf5; }
+    </style>
+</head>
+<body class="bg-portal min-h-screen font-sans text-gray-800">
+
+    <!-- 1. SUBJECT SELECTION PAGE -->
+    <div id="subject-page" class="container mx-auto px-4 py-12">
+        <div class="text-center mb-12 text-white">
+            <h1 class="text-4xl font-extrabold mb-2">Select Your Test Subject</h1>
+            <p class="text-lg opacity-90">Click a card to load live questions from the database</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+            <!-- Science (Category 17) -->
+            <div onclick="prepExam(17, 'Science & Nature')" class="bg-white rounded-2xl overflow-hidden shadow-2xl cursor-pointer transform hover:scale-105 transition">
+                <img src="https://images.pexels.com" class="h-40 w-full object-cover" alt="Science">
+                <div class="p-6 border-t-4 border-green-600 text-center"><h2 class="text-xl font-bold text-green-800">Science</h2></div>
+            </div>
+            <!-- Math (Category 19) -->
+            <div onclick="prepExam(19, 'Mathematics')" class="bg-white rounded-2xl overflow-hidden shadow-2xl cursor-pointer transform hover:scale-105 transition">
+                <img src="https://images.pexels.com" class="h-40 w-full object-cover" alt="Math">
+                <div class="p-6 border-t-4 border-green-600 text-center"><h2 class="text-xl font-bold text-green-800">Mathematics</h2></div>
+            </div>
+            <!-- Gadgets/Tech (Category 30) for Physics-lite -->
+            <div onclick="prepExam(30, 'Physics & Gadgets')" class="bg-white rounded-2xl overflow-hidden shadow-2xl cursor-pointer transform hover:scale-105 transition">
+                <img src="https://images.pexels.com" class="h-40 w-full object-cover" alt="Physics">
+                <div class="p-6 border-t-4 border-green-600 text-center"><h2 class="text-xl font-bold text-green-800">Physics Privately</h2></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. READ CAREFULLY PAGE -->
+    <div id="instruction-page" class="hidden fixed inset-0 bg-white flex items-center justify-center p-6 z-50">
+        <div class="max-w-2xl w-full border-4 border-green-600 rounded-3xl p-10 text-center shadow-2xl">
+            <h2 class="text-4xl font-black text-green-700 mb-6">Read Carefully!</h2>
+            <div class="text-left space-y-4 text-gray-700 mb-10 text-lg">
+                <p>• Subject: <strong id="display-subj" class="text-green-600"></strong></p>
+                <p>• Time Limit: <strong>30 Minutes</strong> (Global Countdown)</p>
+                <p>• Questions: <strong>10 Multiple Choice</strong></p>
+                <p>• Answers save immediately upon selection.</p>
+            </div>
+            <button id="start-btn" onclick="startExam()" class="bg-green-600 text-white px-12 py-4 rounded-full font-bold text-xl hover:bg-green-700 transition w-full shadow-lg">START NOW</button>
+        </div>
+    </div>
+
+    <!-- 3. EXAM INTERFACE -->
+    <div id="exam-page" class="hidden min-h-screen bg-gray-100 flex flex-col">
+        <header class="bg-green-800 text-white p-4 flex justify-between items-center sticky top-0 z-10 shadow-md">
+            <h3 id="exam-header" class="font-bold">Portal Active</h3>
+            <div class="bg-white text-red-600 px-4 py-1 rounded-lg font-mono font-bold">Time: <span id="timer">30:00</span></div>
+        </header>
+
+        <main class="container mx-auto p-4 max-w-3xl mt-4">
+            <div id="questions-container" class="space-y-6 pb-24">
+                <!-- Questions will load here via JS -->
+                <div class="text-center py-20 text-gray-500 italic">Fetching questions from database...</div>
+            </div>
+        </main>
+
+        <footer class="fixed bottom-0 left-0 right-0 bg-white border-t p-4 flex justify-center">
+            <button onclick="submitExam()" class="bg-green-600 text-white px-12 py-3 rounded-xl font-bold hover:bg-green-700 shadow-lg">SUBMIT FINAL ANSWERS</button>
+        </footer>
+    </div>
+
+    <script>
+        let questions = [];
+        let timer = 30 * 60;
+        let interval = null;
+
+        async function prepExam(catId, name) {
+            document.getElementById('subject-page').classList.add('hidden');
+            document.getElementById('instruction-page').classList.remove('hidden');
+            document.getElementById('display-subj').innerText = name;
+            document.getElementById('exam-header').innerText = name + " Session";
+
+            // Fetch from Open Trivia DB
+            /* https://opentdb.com${catId}&type=multiple */
+            try {
+                const res = await fetch(`https://the-trivia-api.com/v2/questions?categories=${catId}&difficulties=hard&limit=10`);
+                const data = await res.json();
+                questions = data.results;
+            } catch (e) { alert("API Error. Check connection."); }
+        }
+
+        function startExam() {
+            document.getElementById('instruction-page').classList.add('hidden');
+            document.getElementById('exam-page').classList.remove('hidden');
+            renderQuestions();
+            interval = setInterval(() => {
+                let m = Math.floor(timer / 60);
+                let s = timer % 60;
+                document.getElementById('timer').innerText = `${m}:${s < 10 ? '0'+s : s}`;
+                if (timer <= 0) submitExam();
+                timer--;
+            }, 1000);
+        }
+
+        function renderQuestions() {
+            const container = document.getElementById('questions-container');
+            container.innerHTML = questions.map((q, i) => {
+                const options = [...q.incorrect_answers, q.correct_answer].sort(() => Math.random() - 0.5);
+                return `
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
+                        <p class="text-xs font-bold text-green-600 uppercase tracking-widest mb-2">Question ${i+1}</p>
+                        <p class="text-lg font-semibold mb-6">${q.question}</p>
+                        <div class="space-y-3">
+                            ${options.map(opt => `
+                                <button onclick="selectOption(this, ${i})" class="option-card w-full text-left p-4 border-2 border-gray-100 rounded-xl hover:border-green-200 transition">
+                                    ${opt}
+                                </button>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function selectOption(btn, qIndex) {
+            const siblings = btn.parentElement.querySelectorAll('.option-card');
+            siblings.forEach(s => s.classList.remove('selected', 'border-green-600', 'bg-green-50'));
+            btn.classList.add('selected', 'border-green-600', 'bg-green-50');
+        }
+
+        function submitExam() {
+            clearInterval(interval);
+            alert("SUBMITTED SUCCESSFULLY!\n\nYour data has been saved. Well done!");
+            location.reload();
+        }
+    </script>
+</body>
+</html>

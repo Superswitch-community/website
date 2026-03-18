@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>National Math Quiz | Nigeria</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .bg-nigeria { background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('https://images.unsplash.com'); background-size: cover; }
+        .hidden-page { display: none !important; }
+        .selected-opt { background-color: #15803d !important; color: white !important; border-color: #166534 !important; }
+        .nav-active { border: 3px solid #15803d !important; color: #15803d !important; transform: scale(1.1); }
+        .nav-shaded { background-color: #dcfce7 !important; border-color: #15803d !important; }
+    </style>
+</head>
+<body class="bg-slate-50 min-h-screen">
+
+    <!-- PAGE 1: LOGIN -->
+    <div id="page-login" class="min-h-screen flex items-center justify-center bg-nigeria p-4">
+        <div class="max-w-md w-full bg-white rounded-3xl p-10 shadow-2xl text-center border-b-8 border-green-700">
+            <h1 class="text-3xl font-black text-slate-900 mb-6">Candidate Login</h1>
+            <input type="text" id="username" placeholder="Full Name" class="w-full bg-slate-100 rounded-2xl p-5 mb-6 outline-none border-2 border-transparent focus:border-green-500 font-bold">
+            <button onclick="showInstructions()" class="w-full py-5 bg-green-700 text-white rounded-2xl font-bold shadow-xl active:scale-95 transition-all">Proceed</button>
+        </div>
+    </div>
+
+    <!-- PAGE 2: INSTRUCTIONS -->
+    <div id="page-instructions" class="min-h-screen flex items-center justify-center p-4 hidden-page bg-slate-100">
+        <div class="max-w-2xl w-full bg-white rounded-3xl p-10 shadow-xl border-t-8 border-green-700">
+            <h2 class="text-3xl font-bold mb-6 text-green-800">Instructions</h2>
+            <p class="text-slate-600 mb-8 text-lg">Select your answers for all 10 questions. You can go back and change them. Corrections are shown only at the end.</p>
+            <button onclick="startQuiz()" class="w-full py-5 bg-green-700 text-white rounded-2xl font-bold">Start Examination</button>
+        </div>
+    </div>
+
+    <!-- PAGE 3: QUIZ (State-Based) -->
+    <div id="page-quiz" class="min-h-screen hidden-page p-4 lg:p-10">
+        <div class="max-w-6xl mx-auto grid lg:grid-cols-12 gap-8">
+            <div class="lg:col-span-3">
+                <div class="bg-white rounded-3xl p-6 shadow-lg border border-slate-200">
+                    <h3 id="user-display" class="text-xs font-black text-green-700 mb-6 uppercase tracking-widest"></h3>
+                    <div id="nav-bank" class="grid grid-cols-5 gap-3"></div>
+                </div>
+            </div>
+            <div class="lg:col-span-9">
+                <div class="bg-white rounded-3xl p-8 lg:p-12 shadow-2xl border-t-8 border-green-700 relative">
+                    <div class="flex justify-between mb-8">
+                        <span class="font-bold text-slate-400 uppercase">Question <span id="q-idx">1</span></span>
+                    </div>
+                    <div id="quiz-container">
+                        <h2 id="q-text" class="text-2xl font-bold text-slate-800 mb-10"></h2>
+                        <div id="options-grid" class="grid gap-4"></div>
+                    </div>
+                    <div class="mt-12 flex justify-between">
+                        <button onclick="move(-1)" class="px-8 py-3 rounded-xl border-2 border-slate-200 font-bold">Prev</button>
+                        <button onclick="move(1)" id="main-btn" class="px-8 py-3 bg-green-700 text-white font-bold rounded-xl">Next</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PAGE 4: CORRECTIONS -->
+    <div id="page-results" class="min-h-screen hidden-page p-4 lg:p-10 bg-green-50 text-slate-900">
+        <div class="max-w-4xl mx-auto">
+            <div class="bg-white p-10 rounded-3xl shadow-xl text-center mb-10">
+                <h2 class="text-4xl font-black mb-2">Final Grade</h2>
+                <div id="final-score" class="text-6xl font-black text-green-700 mb-4">0/100</div>
+                <button onclick="location.reload()" class="text-green-700 font-bold underline">Retake Quiz</button>
+            </div>
+            <h3 class="text-2xl font-bold mb-6">Corrections Report</h3>
+            <div id="corrections-list" class="space-y-6"></div>
+        </div>
+    </div>
+
+    <script>
+        let questions = [], current = 0, answers = Array(10).fill(null);
+        const API = "https://the-trivia-api.com/v2/questions?categories=science&difficulties=hard&limit=10";
+      /*   const API = "https://the-trivia-api.com/v2/questions?categories=science&difficulties=hard&limit=10" */
+
+        function showInstructions() {
+            if(!document.getElementById('username').value) return alert("Enter Name");
+            document.getElementById('user-display').textContent = document.getElementById('username').value;
+            document.getElementById('page-login').classList.add('hidden-page');
+            document.getElementById('page-instructions').classList.remove('hidden-page');
+        }
+
+        async function startQuiz() {
+            document.getElementById('page-instructions').classList.add('hidden-page');
+            document.getElementById('page-quiz').classList.remove('hidden-page');
+            const res = await fetch(API);
+            questions = await res.json();
+            renderNav();
+            renderQuestion();
+        }
+
+        function renderNav() {
+            const bank = document.getElementById('nav-bank');
+            bank.innerHTML = questions.map((_, i) => `<button onclick="jump(${i})" id="nav-${i}" class="h-10 w-10 rounded-xl bg-slate-50 border border-slate-200 text-xs font-bold">${i+1}</button>`).join('');
+        }
+
+        function renderQuestion() {
+            const q = questions[current];
+            const opts = q.shuffled || [...q.incorrectAnswers, q.correctAnswer].sort(() => Math.random() - 0.5);
+            questions[current].shuffled = opts; // Save shuffle state
+
+            document.getElementById('q-idx').textContent = current + 1;
+            document.getElementById('q-text').textContent = q.question.text;
+            document.getElementById('main-btn').textContent = current === 9 ? "Submit Exam" : "Next";
+
+            const grid = document.getElementById('options-grid');
+            grid.innerHTML = opts.map(o => `
+                <button onclick="saveAnswer('${o.replace(/'/g, "\\'")}')" class="opt-btn p-5 rounded-2xl border-2 text-left font-bold transition-all ${answers[current] === o ? 'selected-opt' : 'border-slate-100 bg-white'}">${o}</button>
+            `).join('');
+
+            document.querySelectorAll('.nav-dot').forEach(d => d?.classList.remove('nav-active'));
+            const dot = document.getElementById(`nav-${current}`);
+            dot.className = `h-10 w-10 rounded-xl border flex items-center justify-center text-xs font-bold nav-active ${answers[current] ? 'nav-shaded' : ''}`;
+        }
+
+        function saveAnswer(val) {
+            answers[current] = val;
+            renderQuestion();
+        }
+
+        function move(dir) {
+            if(dir === 1 && current === 9) return showResults();
+            current = Math.max(0, Math.min(9, current + dir));
+            renderQuestion();
+        }
+
+        function jump(i) { current = i; renderQuestion(); }
+
+        function showResults() {
+            document.getElementById('page-quiz').classList.add('hidden-page');
+            document.getElementById('page-results').classList.remove('hidden-page');
+            
+            let total = 0;
+            const list = document.getElementById('corrections-list');
+            list.innerHTML = questions.map((q, i) => {
+                const isRight = answers[i] === q.correctAnswer;
+                if(isRight) total += 10;
+                return `
+                    <div class="bg-white p-6 rounded-2xl border-l-8 ${isRight ? 'border-green-500' : 'border-red-500'}">
+                        <p class="font-bold text-slate-500 mb-2 uppercase text-xs">Question ${i+1}</p>
+                        <p class="text-lg font-bold mb-4">${q.question.text}</p>
+                        <p class="mb-2">Your Answer: <span class="${isRight ? 'text-green-600' : 'text-red-600'} font-bold">${answers[i] || 'No Answer'}</span></p>
+                        ${!isRight ? `<p class="text-green-700 font-bold">Correct Answer: ${q.correctAnswer}</p>` : ''}
+                    </div>`;
+            }).join('');
+            document.getElementById('final-score').textContent = `${total}/100`;
+        }
+    </script>
+</body>
+</html>

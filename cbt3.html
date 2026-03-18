@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nigeria Edu Portal | Login</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* High-quality Nigerian student photo from Pexels */
+        .bg-custom {
+            background-image: linear-gradient(rgba(0, 56, 28, 0.7), rgba(0, 0, 0, 0.6)), 
+                              url('https://images.pexels.com');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+    </style>
+</head>
+<body class="bg-custom bg-[#008751] min-h-screen flex items-center justify-center font-sans p-4">
+
+    <!-- Login Card -->
+    <div class="bg-white/20 backdrop-blur-xl p-8 rounded-3xl shadow-2xl w-full max-w-md border border-white/30">
+        <div class="text-center mb-10">
+            <!-- Simple Nigerian-themed Icon -->
+            <div class="inline-flex items-center justify-center w-16 h-16 bg-white/30 rounded-full mb-4">
+                <span class="text-3xl">🇳🇬</span>
+            </div>
+            <h1 class="text-3xl font-extrabold text-white tracking-tight">Student Portal</h1>
+            <p class="text-green-50 mt-2 opacity-90">Access your educational dashboard</p>
+        </div>
+
+        <form id="loginForm" class="space-y-5">
+            <div>
+                <label class="block text-sm font-semibold text-white mb-2">Institutional Email</label>
+                <input type="email" id="email" required
+                    class="w-full px-5 py-4 rounded-xl bg-white/20 border border-white/20 text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-[#008751] focus:bg-white/30 transition-all"
+                    placeholder="student@uni.edu.ng">
+            </div>
+
+            <div>
+                <label class="block text-sm font-semibold text-white mb-2">Secure Password</label>
+                <input type="password" id="password" required
+                    class="w-full px-5 py-4 rounded-xl bg-white/20 border border-white/20 text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-[#008751] focus:bg-white/30 transition-all"
+                    placeholder="••••••••">
+            </div>
+
+            <button type="submit" 
+                class="w-full bg-[#008751] hover:bg-[#007043] text-white font-bold py-4 rounded-xl shadow-lg transform hover:-translate-y-1 active:scale-95 transition-all duration-300 uppercase tracking-wider">
+                Log In Now
+            </button>
+        </form>
+
+        <div class="mt-8 text-center border-t border-white/20 pt-6">
+            <a href="#" class="text-white hover:text-green-300 text-sm font-medium transition-colors">Forgot your password?</a>
+            <div class="mt-4 text-white/80 text-sm">
+                Need help? <a href="#" class="text-white font-bold hover:underline">Contact Support</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const user = document.getElementById('email').value.split('@')[0];
+            alert(`Ek'abo (Welcome), ${user}! You are being redirected.`);
+        });
+    </script>
+</body>
+</html>

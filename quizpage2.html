@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>National Math Quiz | Nigeria</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        
+        /* PAGE 1 BACKGROUND: Nigerian Educational Theme */
+        .bg-nigeria-edu {
+            background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), 
+                        url('https://images.unsplash.com');
+            background-size: cover; background-position: center;
+        }
+
+        /* PAGE 3: GREEN AND WHITE THEME */
+        .quiz-arena { background-color: #ffffff; border-top: 8px solid #15803d; }
+        .green-gradient { background: linear-gradient(135deg, #15803d 0%, #166534 100%); }
+        
+        .hidden-screen { display: none !important; }
+        .nav-dot.active { border: 3px solid #15803d; color: #15803d; font-weight: 800; }
+        .nav-dot.answered { background-color: #dcfce7; border-color: #15803d; }
+    </style>
+</head>
+<body class="bg-slate-50 min-h-screen">
+
+    <!-- PAGE 1: LOGIN -->
+    <div id="page-1" class="min-h-screen flex items-center justify-center bg-nigeria-edu p-4">
+        <div class="max-w-md w-full bg-white rounded-[2rem] p-10 shadow-2xl text-center border-b-8 border-green-600">
+            <div class="w-20 h-20 green-gradient rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-lg">
+                <i class="fa-solid fa-user-graduate text-3xl text-white"></i>
+            </div>
+            <h1 class="text-3xl font-black text-slate-900 mb-2">Portal Login</h1>
+            <p class="text-slate-500 mb-8 uppercase tracking-widest text-xs font-bold">Nigerian Educational Service</p>
+            
+            <input type="text" id="username" placeholder="Enter Full Name" 
+                class="w-full bg-slate-100 border-2 border-transparent focus:border-green-500 rounded-2xl p-5 mb-6 outline-none transition-all text-slate-800 font-semibold">
+            
+            <button onclick="showInstructions()" class="w-full py-5 green-gradient text-white rounded-2xl font-bold shadow-xl hover:opacity-90 active:scale-95 transition-all">
+                Proceed to Test
+            </button>
+        </div>
+    </div>
+
+    <!-- PAGE 2: INSTRUCTIONS -->
+    <div id="page-2" class="min-h-screen flex items-center justify-center p-4 hidden-screen bg-slate-100">
+        <div class="max-w-2xl w-full bg-white rounded-[2rem] p-10 shadow-xl border-t-8 border-green-600">
+            <h2 class="text-3xl font-bold text-slate-900 mb-6 flex items-center gap-3">
+                <i class="fa-solid fa-file-signature text-green-600"></i> Rules & Instructions
+            </h2>
+            <ul class="space-y-4 text-slate-600 mb-10 text-lg">
+                <li class="flex gap-4"><span>✅</span> 10 Hard Mathematics questions will be provided.</li>
+                <li class="flex gap-4"><span>✅</span> You have <strong>30 seconds</strong> per question.</li>
+                <li class="flex gap-4"><span>✅</span> Click navigation boxes to skip or return to questions.</li>
+                <li class="flex gap-4"><span>✅</span> Results will be displayed automatically at the end.</li>
+            </ul>
+            <button onclick="startQuiz()" class="w-full py-5 green-gradient text-white rounded-2xl font-bold shadow-lg active:scale-95 transition-all">
+                I Understand, Start Quiz
+            </button>
+        </div>
+    </div>
+
+    <!-- PAGE 3: QUIZ (Green & White Theme) -->
+    <div id="page-3" class="min-h-screen hidden-screen">
+        <div class="max-w-6xl mx-auto p-4 lg:p-10 grid grid-cols-1 lg:grid-cols-12 gap-8">
+            
+            <!-- Side Navigation -->
+            <div class="lg:col-span-3">
+                <div class="bg-white rounded-3xl p-6 shadow-lg border border-slate-200">
+                    <h3 id="display-name" class="text-xs font-black uppercase text-green-700 mb-6 tracking-widest">CANDIDATE: GUEST</h3>
+                    <div id="nav-bank" class="grid grid-cols-5 gap-3"></div>
+                </div>
+            </div>
+
+            <!-- Quiz Main -->
+            <div class="lg:col-span-9">
+                <div class="quiz-arena rounded-3xl p-8 lg:p-12 shadow-2xl relative">
+                    <div id="timer-bar" class="absolute top-0 left-0 h-1.5 bg-green-500 transition-all linear" style="width: 100%"></div>
+                    
+                    <div class="flex justify-between items-center mb-10">
+                        <span class="text-xs font-black text-slate-400 uppercase tracking-widest">Question <span id="q-num">1</span>/10</span>
+                        <div class="text-green-700 font-mono font-bold text-xl flex items-center gap-2">
+                            <i class="fa-regular fa-clock"></i> <span id="timer-text">30s</span>
+                        </div>
+                    </div>
+
+                    <div id="quiz-content">
+                        <h2 id="question-text" class="text-2xl lg:text-3xl font-bold text-slate-800 mb-10">Fetching question...</h2>
+                        <div id="options-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+                    </div>
+
+                    <div class="mt-12 flex justify-between items-center border-t border-slate-100 pt-8">
+                        <button onclick="prev()" class="px-8 py-3 rounded-xl border-2 border-slate-200 font-bold text-slate-500 hover:bg-slate-50">Previous</button>
+                        <button onclick="next()" class="px-10 py-3 green-gradient text-white font-bold rounded-xl shadow-lg active:scale-95">Next</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let questions = [], current = 0, score = 0, timer, timeLeft = 30;
+        const API = "https://the-trivia-api.com/v2/questions?categories=science&difficulties=hard&limit=10";
+
+        // Navigation Logic
+        function showInstructions() {
+            const name = document.getElementById('username').value;
+            if(!name) return alert("Please enter your name!");
+            document.getElementById('display-name').textContent = `CANDIDATE: ${name}`;
+            document.getElementById('page-1').classList.add('hidden-screen');
+            document.getElementById('page-2').classList.remove('hidden-screen');
+        }
+
+        function startQuiz() {
+            document.getElementById('page-2').classList.add('hidden-screen');
+            document.getElementById('page-3').classList.remove('hidden-screen');
+            loadQuestions();
+        }
+
+        // Quiz Engine
+        async function loadQuestions() {
+            const res = await fetch(API);
+            questions = await res.json();
+            renderNav();
+            renderQuestion();
+        }
+
+        function renderNav() {
+            document.getElementById('nav-bank').innerHTML = questions.map((_, i) => 
+                `<button onclick="jump(${i})" id="nav-${i}" class="nav-dot h-10 w-10 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-center text-xs font-bold text-slate-400">${i+1}</button>`
+            ).join('');
+        }
+
+        function renderQuestion() {
+            if(current >= 10) return finish();
+            const q = questions[current];
+            const opts = [...q.incorrectAnswers, q.correctAnswer].sort(() => Math.random() - 0.5);
+            
+            document.getElementById('q-num').textContent = current + 1;
+            document.getElementById('question-text').textContent = q.question.text;
+            
+            const grid = document.getElementById('options-grid');
+            grid.innerHTML = opts.map(o => `
+                <button onclick="check(this, '${o.replace(/'/g, "\\'")}', '${q.correctAnswer.replace(/'/g, "\\'")}')" 
+                    class="opt-btn p-5 rounded-2xl border-2 border-slate-100 text-left font-bold text-slate-700 hover:border-green-500 transition-all bg-white">
+                    ${o}
+                </button>
+            `).join('');
+
+            document.querySelectorAll('.nav-dot').forEach(d => d.classList.remove('active'));
+            document.getElementById(`nav-${current}`).classList.add('active');
+            startTimer();
+        }
+
+        function startTimer() {
+            clearInterval(timer);
+            timeLeft = 30;
+            timer = setInterval(() => {
+                timeLeft--;
+                document.getElementById('timer-text').textContent = `${timeLeft}s`;
+                document.getElementById('timer-bar').style.width = `${(timeLeft/30)*100}%`;
+                if(timeLeft <= 0) check(null, null, questions[current].correctAnswer);
+            }, 1000);
+        }
+
+        function check(btn, selected, correct) {
+            clearInterval(timer);
+            document.querySelectorAll('.opt-btn').forEach(b => b.disabled = true);
+            
+            // COLORING LOGIC
+            if (selected === correct) {
+                btn.classList.add('bg-green-600', 'text-white', 'border-green-600');
+                score += 10;
+            } else {
+                if(btn) btn.classList.add('bg-red-500', 'text-white', 'border-red-500');
+                // Always show correct answer in green
+                document.querySelectorAll('.opt-btn').forEach(b => {
+                    if(b.textContent.trim() === correct) b.classList.add('bg-green-100', 'text-green-700', 'border-green-600');
+                });
+            }
+            document.getElementById(`nav-${current}`).classList.add('answered');
+        }
+
+        function next() { current++; renderQuestion(); }
+        function prev() { if(current > 0) { current--; renderQuestion(); } }
+        function jump(i) { current = i; renderQuestion(); }
+
+        function finish() {
+            document.getElementById('quiz-content').innerHTML = `
+                <div class="text-center py-10">
+                    <h2 class="text-4xl font-black text-slate-900 mb-4">Exam Completed!</h2>
+                    <p class="text-xl text-slate-500 mb-8">Your Grade: <span class="text-green-600 font-bold">${score}/100</span></p>
+                    <button onclick="location.reload()" class="px-10 py-4 green-gradient text-white rounded-2xl font-bold">Return to Start</button>
+                </div>`;
+        }
+    </script>
+</body>
+</html>

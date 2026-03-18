@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login Page</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="./index.js"></script>
+  
+</head>
+
+<body class="bg-gray-100 min-h-screen">
+
+  <!-- NAVBAR -->
+  <nav class="bg-green-700 text-white">
+    <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+
+      <!-- Logo -->
+      <h1 class="text-2xl font-bold">Challengehub</h1>
+
+      <!-- Desktop Menu -->
+      <div class="hidden md:flex space-x-6 text-lg">
+        <a href="./index.html" class="hover:text-gray-200">Home</a>
+        <a href="./adminlogin.html" class="hover:text-gray-200">Admin</a>
+        <a href="./signup.html" class="hover:text-gray-200">Signup</a>
+        <a href="./login.html" class="hover:text-gray-200">Login</a>
+      </div>
+
+      <!-- Mobile Hamburger -->
+      <button id="menuBtn" class="md:hidden">
+        <svg class="w-7 h-7" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+      </button>
+    </div>
+
+    <!-- Mobile Menu -->
+    <div id="mobileMenu" class="md:hidden slide-up bg-green-800">
+      <a href="#" class="block px-4 py-2 hover:bg-green-900">Home</a>
+      <a href="#" class="block px-4 py-2 hover:bg-green-900">Admin</a>
+      <a href="#" class="block px-4 py-2 hover:bg-green-900">Signup</a>
+      <a href="#" class="block px-4 py-2 hover:bg-green-900">Login</a>
+    </div>
+  </nav>
+
+
+
+  <!-- Login Container -->
+  <div class="bg-white shadow-lg mx-auto mt-6 rounded-lg w-full max-w-md p-8">
+
+    <!-- Logo / Header -->
+    <div class="text-center mb-6">
+      <h1 class="text-3xl font-bold text-gray-800">Challengehub</h1>
+      <p class="text-gray-500 mt-2">Welcome back! Please login to your account.</p>
+    </div>
+
+    <!-- Login Form -->
+    <form action="#" method="POST" class="bg-white p-8 rounded-xl shadow-lg max-w-3xl w-full space-y-6">
+
+      <!-- Email Input with Icon -->
+      <div class="relative">
+        <label for="email" class="block text-gray-700 font-medium mb-2">Email</label>
+        <div class="relative">
+          <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400">
+            <!-- Email Icon -->
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M16 12l-4-4-4 4m0 0l4 4 4-4m-4 4V4" />
+            </svg>
+          </span>
+          <input type="email" id="email" name="email" placeholder="you@example.com"
+            class="w-full pl-10 pr-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
+            required>
+        </div>
+      </div>
+
+      <!-- Password Input with Toggle -->
+      <div class="relative">
+        <label for="password" class="block text-gray-700 font-medium mb-2">Password</label>
+        <div class="relative">
+          <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400">
+            <!-- Lock Icon -->
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M12 11c-1.1 0-2 .9-2 2v2h4v-2c0-1.1-.9-2-2-2z" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 11V7a6 6 0 0112 0v4" />
+            </svg>
+          </span>
+          <input type="password" id="password" placeholder="********"
+            class="w-full pl-10 pr-10 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
+            required>
+          <!-- Eye Icon for toggling -->
+          <span class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 cursor-pointer"
+            onclick="togglePassword()">
+            <svg id="eyeIcon" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+            </svg>
+          </span>
+        </div>
+      </div>
+
+
+
+      <!-- Submit Button -->
+      <button type="submit"
+        class="w-full bg-green-600 text-white py-3 rounded-lg font-semibold hover:bg-green-700 transition">Login</button>
+
+      <div class="space-y-3">
+        <!-- Sign Up Link -->
+        <p class="text-center text-gray-500 mt-6 text-sm">
+          Don’t have an account?
+          <a href="./signup.html" class="text-green-500 hover:underline">Sign Up</a>
+        </p>
+      </div>
+      <!--  <div class="space-y-3">
+            
+        </form>
+
+        
+            <-- Email Input -->
+      <!--     <div>
+                <label for="email" class="block text-gray-700 font-medium mb-2">Email</label>
+                <input type="email" id="email" name="email" placeholder="you@example.com"
+                    class="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-blue-500" required>
+            </div>
+ -->
+      <!-- Password Input -->
+      <!--      <div>
+                <label for="password" class="block text-gray-700 font-medium mb-2">Password</label>
+                <input type="password" id="password" name="password" placeholder="********"
+                    class="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500" required>
+            </div> -->
+
+      <!-- Forgot Password -->
+      <!--   <div class="text-right">
+                <a href="#" class="text-blue-500 hover:underline text-sm">Forgot password?</a>
+            </div> -->
+
+      <!-- Divider -->
+      <!--    <div class="flex items-center my-6">
+            <hr class="flex-grow border-gray-300">
+            <span class="mx-4 text-gray-400">OR</span>
+            <hr class="flex-grow border-gray-300">
+        </div>
+ -->
+
+
+
+      <!-- Email Input -->
+      <!--     <div>
+                <label for="email" class="block text-gray-700 font-medium mb-2">Email</label>
+                <input type="email" id="email" name="email" placeholder="you@example.com"
+                    class="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-blue-500" required>
+            </div>
+ -->
+      <!-- Password Input -->
+      <!--      <div>
+                <label for="password" class="block text-gray-700 font-medium mb-2">Password</label>
+                <input type="password" id="password" name="password" placeholder="********"
+                    class="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500" required>
+            </div> -->
+
+      <!-- Forgot Password -->
+      <!--   <div class="text-right">
+                <a href="#" class="text-blue-500 hover:underline text-sm">Forgot password?</a>
+            </div> -->
+  </div>
+
+
+</body>
+<script src="./static/script.js"></script>
+</html>

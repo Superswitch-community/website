@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Math Quiz</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-900 text-white min-h-screen flex items-center justify-center p-4">
+
+    <div class="max-w-md w-full bg-slate-800 rounded-2xl shadow-2xl p-8 border border-slate-700">
+        <!-- Header -->
+        <div class="mb-8 text-center">
+            <h1 class="text-3xl font-bold bg-gradient-to-r from-blue-400 to-emerald-400 bg-clip-text text-transparent">Math Genius</h1>
+            <p class="text-slate-400 text-sm mt-1 uppercase tracking-widest">Hard Difficulty</p>
+        </div>
+
+        <!-- Question Area -->
+        <div id="quiz-box">
+            <div id="loading" class="text-center py-10">
+                <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-500 mx-auto"></div>
+                <p class="mt-4 text-slate-400">Fetching math problem...</p>
+            </div>
+
+            <div id="content" class="hidden">
+                <p id="question" class="text-lg font-medium mb-6 leading-relaxed"></p>
+                <div id="options" class="space-y-3">
+                    <!-- Buttons will be injected here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Feedback & Next -->
+        <div id="feedback" class="mt-6 hidden">
+            <p id="result-text" class="text-center font-bold text-lg mb-4"></p>
+            <button onclick="loadQuestion()" class="w-full py-3 bg-blue-600 hover:bg-blue-500 rounded-xl font-semibold transition-all shadow-lg shadow-blue-900/20">
+                Next Challenge
+            </button>
+        </div>
+    </div>
+
+    <script>
+        const questionEl = document.getElementById('question');
+        const optionsEl = document.getElementById('options');
+        const contentEl = document.getElementById('content');
+        const loadingEl = document.getElementById('loading');
+        const feedbackEl = document.getElementById('feedback');
+        const resultText = document.getElementById('result-text');
+
+        // Modern Endpoint: The Trivia API (Category: Science/Math, Difficulty: Hard)
+        const API_URL = "https://the-trivia-api.com/v2/questions?categories=science&difficulties=easy&limit=1";
+
+        async function loadQuestion() {
+            // Reset UI
+            feedbackEl.classList.add('hidden');
+            contentEl.classList.add('hidden');
+            loadingEl.classList.remove('hidden');
+            optionsEl.innerHTML = '';
+
+            try {
+                const response = await fetch(API_URL);
+                const data = await response.json();
+                const quiz = data[0];
+
+                // Setup Question
+                questionEl.textContent = quiz.question.text;
+
+                // Shuffle Answers
+                const allAnswers = [...quiz.incorrectAnswers, quiz.correctAnswer];
+                allAnswers.sort(() => Math.random() - 0.5);
+
+                allAnswers.forEach(answer => {
+                    const btn = document.createElement('button');
+                    btn.className = "w-full text-left p-4 rounded-xl bg-slate-700 hover:bg-slate-600 border border-slate-600 transition-all active:scale-[0.98]";
+                    btn.textContent = answer;
+                    btn.onclick = () => checkAnswer(answer, quiz.correctAnswer);
+                    optionsEl.appendChild(btn);
+                });
+
+                loadingEl.classList.add('hidden');
+                contentEl.classList.remove('hidden');
+            } catch (err) {
+                questionEl.textContent = "Failed to load question. Check your connection.";
+                loadingEl.classList.add('hidden');
+                contentEl.classList.remove('hidden');
+            }
+        }
+
+        function checkAnswer(selected, correct) {
+            // Disable buttons after choice
+            Array.from(optionsEl.children).forEach(btn => {
+                btn.disabled = true;
+                if (btn.textContent === correct) {
+                    btn.classList.replace('bg-slate-700', 'bg-emerald-600/30');
+                    btn.classList.add('border-emerald-500');
+                } else if (btn.textContent === selected) {
+                    btn.classList.replace('bg-slate-700', 'bg-rose-600/30');
+                    btn.classList.add('border-rose-500');
+                }
+            });
+
+            if (selected === correct) {
+                resultText.textContent = "✨ Excellent Work!";
+                resultText.className = "text-center font-bold text-lg mb-4 text-emerald-400";
+            } else {
+                resultText.textContent = "Better luck next time!";
+                resultText.className = "text-center font-bold text-lg mb-4 text-rose-400";
+            }
+            feedbackEl.classList.remove('hidden');
+        }
+
+        // Initial Start
+        loadQuestion();
+    </script>
+</body>
+</html>

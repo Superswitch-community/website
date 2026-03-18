@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Student...</title>
+    <script src="./static/index.js"></script>
+</head>
+
+<body>
+    <div class="min-h-screen bg-gray-100 flex items-center justify-center p-6">
+        <form class="bg-white p-8 rounded-xl shadow-lg max-w-8xl w-full space-y-6">
+
+            <h2 class="text-2xl font-bold text-gray-800">Create Account</h2>
+
+
+            <!-- EMAIL -->
+            <div>
+                <label class="block text-gray-700 mb-1 font-medium">Email</label>
+                <input id="email" name="email" type="email"
+                    class="w-full border rounded-lg p-3 focus:outline-none focus:ring-green-500" required />
+
+            </div>
+
+            <!-- PASSWORD -->
+            <div>
+                <label class="block text-gray-700 mb-1 font-medium">Password</label>
+                <input id="password" name="password" type="password"
+                    class="w-full border rounded-lg p-3 focus:outline-none focus:ring-green-500" required />
+
+            </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+
+
+                <!-- SUBMIT -->
+                <button id="submit-btn"
+                    class="w-full bg-green-600 text-white py-3 rounded-lg text-lg font-semibold transition"
+                    onclick="openPopup()">
+                    Create Account
+                </button>
+
+
+                <div class="space-y-3">
+                    <!-- Sign Up Link -->
+                    <p class="text-center text-gray-500 mt-6 text-sm">
+                        Already have an account?
+                        <a href="./login.html" class="text-green-500 hover:underline">Login</a>
+                    </p>
+                </div>
+        </form>
+    </div>
+
+    <!-- POPUP OVERLAY -->
+    <div id="popupOverlay" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden">
+
+        <!-- POPUP CARD -->
+        <div class="relative bg-white shadow-xl rounded-xl p-8 w-full max-w-md">
+
+
+            <!-- FORM CONTENT -->
+            <h2 class="text-xl font-bold mb-4" id="alert-message">Creating Account...</h2>
+
+            <div class="space-y-4">
+                <div class="flex items-center mt-12 justify-center mx-auto" id="spinner">
+                    <div
+                        class="w-12 h-12 border-2 border-gray-300 border-t-green-600 rounded-full animate-spin mx-auto">
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+    </div>
+
+</body>
+<script>
+
+    document.getElementById('submit-btn').addEventListener('click', async (e) => {
+        e.preventDefault();
+
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+
+        if (!email || !password) {
+            openPopup();
+            document.getElementById('alert-message').textContent = "Invalid Request!"
+            document.getElementById('spinner').innerHTML = "All fields must be available";
+            setTimeout(() => {
+                closePopup();
+            }, 3000)
+        }
+        else {
+            document.getElementById('alert-message').textContent = "Creating Account..."
+            document.getElementById('spinner').innerHTML = `
+              <div class="flex items-center mt-2 justify-center mx-auto" id="spinner">
+                    <div
+                        class="w-12 h-12 border-2 border-gray-300 border-t-green-600 rounded-full animate-spin mx-auto">
+                    </div>
+                </div>`;
+            try {
+                const response = await fetch('http://localhost:5000/api/students', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                })
+
+                document.querySelector('form').reset();
+                const data = await response.json()
+                if (response.status == "200") {
+                    document.getElementById('spinner').innerHTML = data.msg;
+                    setTimeout(() => {
+                        closePopup();
+                    }, 3000)
+                }
+
+
+            } catch (error) {
+                console.log(error)
+            }
+
+        }
+
+
+    })
+
+    function openPopup() {
+        document.getElementById("popupOverlay").classList.remove("hidden");
+    }
+
+    function closePopup() {
+        document.getElementById("popupOverlay").classList.add("hidden");
+    }
+</script>
+
+</html>

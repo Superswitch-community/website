@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Naija Edu-Test Portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .bg-portal {
+            background: linear-gradient(rgba(0, 135, 81, 0.8), rgba(0, 60, 36, 0.9)), 
+                        url('https://images.pexels.com');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+        .glass { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); }
+    </style>
+</head>
+<body class="bg-portal min-h-screen font-sans text-gray-800">
+
+    <!-- 1. SUBJECT SELECTION PAGE -->
+    <div id="subject-page" class="container mx-auto px-4 py-12">
+        <div class="text-center mb-12 text-white">
+            <h1 class="text-4xl font-extrabold mb-2">Welcome to the Exam Portal</h1>
+            <p class="text-lg opacity-90">Select a subject to begin your practice test</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+            <!-- Science Card -->
+            <div onclick="showInstructions('General Science')" class="bg-white rounded-2xl overflow-hidden shadow-2xl cursor-pointer transform hover:scale-105 transition">
+                <img src="https://images.pexels.com" class="h-48 w-full object-cover" alt="Science">
+                <div class="p-6 border-t-4 border-green-600 text-center">
+                    <h2 class="text-2xl font-bold text-green-800">General Science</h2>
+                    <p class="text-gray-600 mt-2">Physics, Chemistry & Biology</p>
+                </div>
+            </div>
+
+            <!-- Math Card -->
+            <div onclick="showInstructions('Mathematics')" class="bg-white rounded-2xl overflow-hidden shadow-2xl cursor-pointer transform hover:scale-105 transition">
+                <img src="https://images.pexels.com" class="h-48 w-full object-cover" alt="Math">
+                <div class="p-6 border-t-4 border-green-600 text-center">
+                    <h2 class="text-2xl font-bold text-green-800">Mathematics</h2>
+                    <p class="text-gray-600 mt-2">Calculus, Algebra & Geometry</p>
+                </div>
+            </div>
+
+            <!-- Physics Card -->
+            <div onclick="showInstructions('Physics')" class="bg-white rounded-2xl overflow-hidden shadow-2xl cursor-pointer transform hover:scale-105 transition">
+                <img src="https://images.pexels.com" class="h-48 w-full object-cover" alt="Physics">
+                <div class="p-6 border-t-4 border-green-600 text-center">
+                    <h2 class="text-2xl font-bold text-green-800">Physics Private</h2>
+                    <p class="text-gray-600 mt-2">Mechanics & Thermodynamics</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. READ CAREFULLY PAGE -->
+    <div id="instruction-page" class="hidden fixed inset-0 bg-white flex items-center justify-center p-6">
+        <div class="max-w-2xl w-full border-2 border-green-600 rounded-3xl p-8 shadow-xl text-center">
+            <h2 class="text-3xl font-bold text-green-700 mb-4">Read Carefully!</h2>
+            <div class="text-left space-y-4 text-gray-700 mb-8">
+                <p>• You have selected: <strong id="selected-subject" class="text-green-600"></strong></p>
+                <p>• The exam consists of multiple-choice questions.</p>
+                <p>• You have exactly <strong>30 minutes</strong> to complete the test.</p>
+                <p>• Ensure you submit before the timer reaches zero.</p>
+                <p>• Answers are saved automatically when you click an option.</p>
+            </div>
+            <button onclick="startExam()" class="bg-green-600 text-white px-10 py-4 rounded-full font-bold text-xl hover:bg-green-700 transition w-full">START EXAM</button>
+        </div>
+    </div>
+
+    <!-- 3. EXAM INTERFACE -->
+    <div id="exam-page" class="hidden min-h-screen bg-gray-50 flex flex-col">
+        <!-- Header with Timer -->
+        <header class="bg-green-700 text-white p-4 flex justify-between items-center sticky top-0 z-10">
+            <h3 id="exam-title" class="font-bold text-lg"></h3>
+            <div class="bg-white text-red-600 px-4 py-2 rounded-lg font-mono text-xl font-bold shadow-inner">
+                Time Left: <span id="timer">30:00</span>
+            </div>
+        </header>
+
+        <main class="flex-grow container mx-auto p-6 max-w-4xl">
+            <!-- Question Container -->
+            <div class="bg-white rounded-xl shadow-lg p-8 mb-6">
+                <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-bold">Question #1</span>
+                <p class="text-xl font-medium mt-4 mb-8">What is the capital of Nigeria or the primary focus of this specific study area?</p>
+                
+                <div class="space-y-4">
+                    <label onclick="saveAnswer(1, 'A')" class="flex items-center p-4 border-2 rounded-xl cursor-pointer hover:border-green-400 transition group">
+                        <input type="radio" name="q1" class="w-5 h-5 text-green-600">
+                        <span class="ml-4 text-lg">Option A: Abuja / Core Concept</span>
+                    </label>
+                    <label onclick="saveAnswer(1, 'B')" class="flex items-center p-4 border-2 rounded-xl cursor-pointer hover:border-green-400 transition">
+                        <input type="radio" name="q1" class="w-5 h-5 text-green-600">
+                        <span class="ml-4 text-lg">Option B: Lagos / Secondary Theory</span>
+                    </label>
+                    <label onclick="saveAnswer(1, 'C')" class="flex items-center p-4 border-2 rounded-xl cursor-pointer hover:border-green-400 transition">
+                        <input type="radio" name="q1" class="w-5 h-5 text-green-600">
+                        <span class="ml-4 text-lg">Option C: Kano / Practical Logic</span>
+                    </label>
+                </div>
+            </div>
+
+            <button onclick="finalSubmit()" class="w-full bg-green-600 text-white py-4 rounded-xl font-bold text-lg shadow-lg hover:bg-green-700 mb-10">SUBMIT FINAL ANSWERS</button>
+        </main>
+    </div>
+
+    <script>
+        let timeLeft = 30 * 60; // 30 minutes in seconds
+        let timerId = null;
+
+        function showInstructions(subject) {
+            document.getElementById('subject-page').classList.add('hidden');
+            document.getElementById('instruction-page').classList.remove('hidden');
+            document.getElementById('selected-subject').innerText = subject;
+            document.getElementById('exam-title').innerText = subject + " Test - 2024 Sessions";
+        }
+
+        function startExam() {
+            document.getElementById('instruction-page').classList.add('hidden');
+            document.getElementById('exam-page').classList.remove('hidden');
+            
+            // Start Timer
+            timerId = setInterval(updateTimer, 1000);
+        }
+
+        function updateTimer() {
+            const minutes = Math.floor(timeLeft / 60);
+            let seconds = timeLeft % 60;
+            seconds = seconds < 10 ? '0' + seconds : seconds;
+            document.getElementById('timer').innerText = `${minutes}:${seconds}`;
+            
+            if (timeLeft <= 0) {
+                clearInterval(timerId);
+                finalSubmit();
+            }
+            timeLeft--;
+        }
+
+        function saveAnswer(qNum, choice) {
+            // Visual feedback for "shaded" effect
+            const options = event.currentTarget.parentElement.children;
+            for (let opt of options) {
+                opt.classList.remove('bg-green-50', 'border-green-500');
+            }
+            event.currentTarget.classList.add('bg-green-50', 'border-green-500');
+            console.log(`Saved Question ${qNum}: ${choice}`);
+        }
+
+        function finalSubmit() {
+            clearInterval(timerId);
+            alert("✅ TEST SUBMITTED SUCCESSFULLY!\n\nYour answers have been saved to the portal. Welldone on completing your session.");
+            location.reload(); // Returns to main page
+        }
+    </script>
+</body>
+</html>

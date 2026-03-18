@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Math Mastery | Premium Quiz</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); }
+    </style>
+</head>
+<body class="bg-[#0f172a] text-slate-200 min-h-screen flex items-center justify-center p-4 lg:p-8">
+
+    <div class="max-w-6xl w-full grid grid-cols-1 lg:grid-cols-12 gap-6">
+        
+        <!-- LEFT: NAVIGATION BANK -->
+        <div class="lg:col-span-3 order-2 lg:order-1">
+            <div class="glass rounded-3xl p-6 h-full">
+                <h3 class="text-sm font-bold uppercase tracking-widest text-slate-500 mb-6">Question Bank</h3>
+                <div id="question-bank" class="grid grid-cols-5 gap-3">
+                    <!-- Nav items injected here -->
+                </div>
+                <div class="mt-8 pt-6 border-t border-slate-700/50">
+                    <div class="flex justify-between text-sm mb-2">
+                        <span>Progress</span>
+                        <span id="progress-percent">0%</span>
+                    </div>
+                    <div class="w-full bg-slate-700 rounded-full h-1.5">
+                        <div id="progress-bar" class="bg-blue-500 h-1.5 rounded-full transition-all duration-500" style="width: 0%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CENTER: MAIN QUIZ INTERFACE -->
+        <div class="lg:col-span-9 order-1 lg:order-2">
+            <div class="glass rounded-3xl p-8 relative overflow-hidden">
+                <!-- Timer Bar -->
+                <div id="timer-bar" class="absolute top-0 left-0 h-1 bg-gradient-to-r from-blue-500 to-cyan-400 transition-all linear" style="width: 100%"></div>
+
+                <div class="flex justify-between items-center mb-10">
+                    <span class="px-4 py-1 rounded-full bg-blue-500/10 text-blue-400 text-xs font-bold border border-blue-500/20 uppercase">Hard Mathematics</span>
+                    <div class="flex items-center gap-2 text-amber-400 font-mono font-bold">
+                        <i class="fa-regular fa-clock"></i>
+                        <span id="timer-text">30s</span>
+                    </div>
+                </div>
+
+                <div id="quiz-content">
+                    <h2 id="question-text" class="text-2xl lg:text-3xl font-semibold mb-8 leading-snug">Fetching the latest challenges...</h2>
+                    
+                    <div id="options-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Options injected here -->
+                    </div>
+                </div>
+
+                <div class="mt-10 flex justify-between items-center">
+                    <div id="score-box" class="text-slate-400 text-sm">
+                        Score: <span id="current-score" class="text-white font-bold text-lg">0</span>
+                    </div>
+                    <button id="next-btn" onclick="nextQuestion()" class="hidden px-8 py-3 bg-white text-black font-bold rounded-2xl hover:bg-blue-400 hover:text-white transition-all transform active:scale-95">
+                        Next Question <i class="fa-solid fa-arrow-right ml-2"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let questions = [];
+        let currentIndex = 0;
+        let score = 0;
+        let timeLeft = 30;
+        let timerInterval;
+        const totalQuestions = 10;
+
+        // ENDPOINT: 10 Hard Science/Math questions
+        const API_URL = "https://the-trivia-api.com/v2/questions?categories=science&difficulties=hard&limit=10";
+
+        async function initQuiz() {
+            try {
+                const response = await fetch(API_URL);
+                questions = await response.json();
+                renderBank();
+                showQuestion();
+            } catch (err) {
+                document.getElementById('question-text').textContent = "Failed to load questions. Please refresh.";
+            }
+        }
+
+        function renderBank() {
+            const bank = document.getElementById('question-bank');
+            bank.innerHTML = '';
+            for (let i = 0; i < totalQuestions; i++) {
+                const dot = document.createElement('div');
+                dot.id = `bank-dot-${i}`;
+                dot.className = "h-10 w-10 rounded-xl glass flex items-center justify-center text-xs font-bold transition-all";
+                dot.textContent = i + 1;
+                bank.appendChild(dot);
+            }
+        }
+
+        function showQuestion() {
+            if (currentIndex >= totalQuestions) return finishQuiz();
+            
+            const q = questions[currentIndex];
+            const options = [...q.incorrectAnswers, q.correctAnswer].sort(() => Math.random() - 0.5);
+            
+            // Update UI
+            document.getElementById('question-text').textContent = q.question.text;
+            const optionsGrid = document.getElementById('options-grid');
+            optionsGrid.innerHTML = '';
+            document.getElementById('next-btn').classList.add('hidden');
+            
+            // Update Bank active state
+            document.getElementById(`bank-dot-${currentIndex}`).classList.add('border-blue-500', 'text-blue-400', 'bg-blue-500/10');
+
+            options.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = "option-btn p-5 rounded-2xl bg-slate-800/50 border border-slate-700 text-left hover:border-slate-500 transition-all group relative overflow-hidden";
+                btn.innerHTML = `<span class="relative z-10">${opt}</span>`;
+                btn.onclick = () => handleAnswer(opt, q.correctAnswer, btn);
+                optionsGrid.appendChild(btn);
+            });
+
+            startTimer();
+        }
+
+        function startTimer() {
+            clearInterval(timerInterval);
+            timeLeft = 30;
+            const bar = document.getElementById('timer-bar');
+            const text = document.getElementById('timer-text');
+            
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                text.textContent = `${timeLeft}s`;
+                bar.style.width = `${(timeLeft / 30) * 100}%`;
+                
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    handleAnswer(null, questions[currentIndex].correctAnswer);
+                }
+            }, 1000);
+        }
+
+        function handleAnswer(selected, correct, btn) {
+            clearInterval(timerInterval);
+            const allBtns = document.querySelectorAll('.option-btn');
+            allBtns.forEach(b => b.disabled = true);
+
+            const dot = document.getElementById(`bank-dot-${currentIndex}`);
+
+            if (selected === correct) {
+                btn.classList.add('bg-emerald-500/20', 'border-emerald-500', 'text-emerald-400');
+                score += 10;
+                document.getElementById('current-score').textContent = score;
+                dot.classList.replace('text-blue-400', 'text-emerald-400');
+            } else {
+                if (btn) btn.classList.add('bg-rose-500/20', 'border-rose-500', 'text-rose-400');
+                dot.classList.replace('text-blue-400', 'text-rose-400');
+            }
+
+            document.getElementById('next-btn').classList.remove('hidden');
+            updateProgress();
+        }
+
+        function updateProgress() {
+            const prog = ((currentIndex + 1) / totalQuestions) * 100;
+            document.getElementById('progress-bar').style.width = `${prog}%`;
+            document.getElementById('progress-percent').textContent = `${Math.round(prog)}%`;
+        }
+
+        function nextQuestion() {
+            currentIndex++;
+            showQuestion();
+        }
+
+        function finishQuiz() {
+            document.getElementById('quiz-content').innerHTML = `
+                <div class="text-center py-10">
+                    <div class="text-6xl mb-6">🏆</div>
+                    <h2 class="text-3xl font-bold mb-2">Quiz Complete!</h2>
+                    <p class="text-slate-400 mb-8">You scored ${score} points</p>
+                    <button onclick="location.reload()" class="px-10 py-4 bg-blue-600 rounded-2xl font-bold">Try Again</button>
+                </div>
+            `;
+            document.getElementById('next-btn').classList.add('hidden');
+        }
+
+        initQuiz();
+    </script>
+</body>
+</html>
