@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HopeCare Foundation</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-50 text-gray-800">
+
+  <!-- NAVBAR -->
+  <header class="bg-white shadow-md fixed w-full z-50">
+    <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+      <h1 class="text-2xl font-bold text-blue-600">HopeCare</h1>
+      <nav class="hidden md:flex space-x-6">
+        <a href="#" class="hover:text-blue-600">Home</a>
+        <a href="#about" class="hover:text-blue-600">About</a>
+        <a href="#programs" class="hover:text-blue-600">Programs</a>
+        <a href="#contact" class="hover:text-blue-600">Contact</a>
+      </nav>
+      <button class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
+        Donate
+      </button>
+    </div>
+  </header>
+
+  <!-- HERO SECTION -->
+  <section class="h-screen flex items-center justify-center bg-cover bg-center"
+    style="background-image: url('https://images.unsplash.com/photo-1526256262350-7da7584cf5eb');">
+    
+    <div class="bg-black/60 p-10 rounded-xl text-center text-white max-w-2xl">
+      <h2 class="text-4xl md:text-5xl font-bold mb-4">
+        Empowering Lives, Restoring Hope
+      </h2>
+      <p class="mb-6 text-lg">
+        Supporting people with disabilities through care, education, and opportunity.
+      </p>
+      <button onclick="showMessage()" 
+        class="bg-blue-600 px-6 py-3 rounded-lg text-lg hover:bg-blue-700">
+        Join Us
+      </button>
+    </div>
+  </section>
+
+  <!-- ABOUT -->
+  <section id="about" class="py-16 px-6 max-w-6xl mx-auto">
+    <h2 class="text-3xl font-bold text-center mb-8">About Us</h2>
+    <p class="text-center text-lg">
+      HopeCare Foundation is dedicated to improving the lives of individuals living 
+      with disabilities. We provide education, healthcare support, and empowerment 
+      programs to help them live independently and with dignity.
+    </p>
+  </section>
+
+  <!-- PROGRAMS -->
+  <section id="programs" class="bg-gray-100 py-16 px-6">
+    <h2 class="text-3xl font-bold text-center mb-12">Our Programs</h2>
+
+    <div class="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+
+      <div class="bg-white p-6 rounded-xl shadow hover:shadow-lg">
+        <h3 class="text-xl font-semibold mb-2">Education Support</h3>
+        <p>Providing access to inclusive education and learning materials.</p>
+      </div>
+
+      <div class="bg-white p-6 rounded-xl shadow hover:shadow-lg">
+        <h3 class="text-xl font-semibold mb-2">Healthcare Aid</h3>
+        <p>Medical support and rehabilitation for people with disabilities.</p>
+      </div>
+
+      <div class="bg-white p-6 rounded-xl shadow hover:shadow-lg">
+        <h3 class="text-xl font-semibold mb-2">Skill Training</h3>
+        <p>Empowering individuals with skills for financial independence.</p>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- IMPACT -->
+  <section class="py-16 px-6 text-center">
+    <h2 class="text-3xl font-bold mb-10">Our Impact</h2>
+
+    <div class="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+      <div>
+        <h3 class="text-4xl font-bold text-blue-600">500+</h3>
+        <p>Lives Impacted</p>
+      </div>
+
+      <div>
+        <h3 class="text-4xl font-bold text-blue-600">200+</h3>
+        <p>Children Supported</p>
+      </div>
+
+      <div>
+        <h3 class="text-4xl font-bold text-blue-600">50+</h3>
+        <p>Volunteers</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section id="contact" class="bg-blue-600 text-white py-16 px-6">
+    <h2 class="text-3xl font-bold text-center mb-8">Contact Us</h2>
+
+    <div class="max-w-xl mx-auto text-center">
+      <p>Email: info@hopecare.org</p>
+      <p>Phone: +234 800 000 0000</p>
+
+      <button onclick="alert('Thank you for reaching out!')" 
+        class="mt-6 bg-white text-blue-600 px-6 py-2 rounded-lg">
+        Send Message
+      </button>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="bg-gray-900 text-white text-center py-6">
+    <p>&copy; 2026 HopeCare Foundation. All rights reserved.</p>
+  </footer>
+
+  <!-- JS -->
+  <script>
+    function showMessage() {
+      alert("Welcome! Thank you for supporting our mission ❤️");
+    }
+  </script>
+
+</body>
+  </html>
