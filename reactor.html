@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Long Press Emoji Reaction</title>
+  <title>Pro Chat Reaction</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
@@ -13,21 +13,21 @@
     
     <!-- Message -->
     <div id="messageBox" 
-      class="bg-white p-4 rounded-2xl shadow select-none">
+      class="bg-white p-4 rounded-2xl shadow select-none relative">
       
       <p class="text-gray-800">
         <span class="font-semibold">John:</span> Hey! How are you doing today?
       </p>
 
-      <!-- Hidden Input (for emoji keyboard) -->
+      <!-- Hidden Input -->
       <input 
         type="text" 
         id="emojiInput"
         class="opacity-0 absolute pointer-events-none"
       />
 
-      <!-- Reaction Display -->
-      <div id="reactionDisplay" class="mt-2 text-lg"></div>
+      <!-- Reactions Container -->
+      <div id="reactions" class="flex gap-1 mt-2"></div>
     </div>
 
   </div>
@@ -35,42 +35,52 @@
 <script>
   const message = document.getElementById("messageBox");
   const input = document.getElementById("emojiInput");
-  const display = document.getElementById("reactionDisplay");
+  const reactionsBox = document.getElementById("reactions");
 
   let pressTimer;
+  let userReaction = null;
 
   // LONG PRESS
   message.addEventListener("touchstart", () => {
-    pressTimer = setTimeout(() => {
-      input.focus(); // opens phone keyboard
-    }, 500);
+    pressTimer = setTimeout(() => input.focus(), 500);
   });
 
   message.addEventListener("touchend", () => {
     clearTimeout(pressTimer);
   });
 
-  // DESKTOP SUPPORT
   message.addEventListener("mousedown", () => {
-    pressTimer = setTimeout(() => {
-      input.focus();
-    }, 500);
+    pressTimer = setTimeout(() => input.focus(), 500);
   });
 
   message.addEventListener("mouseup", () => {
     clearTimeout(pressTimer);
   });
 
-  // HANDLE EMOJI INPUT
+  // HANDLE INPUT
   input.addEventListener("input", (e) => {
-    const value = e.target.value;
+    const emoji = e.target.value.slice(-2);
 
-    // get last emoji typed
-    const emoji = value.slice(-2);
+    if (!emoji) return;
 
-    display.textContent = emoji;
+    // Remove old reaction if exists
+    if (userReaction) {
+      userReaction.remove();
+    }
 
-    // clear input
+    // Create new reaction
+    const span = document.createElement("span");
+    span.textContent = emoji;
+    span.className = "text-lg bg-gray-200 px-2 rounded-full cursor-pointer";
+
+    // Allow change on click
+    span.addEventListener("click", () => {
+      input.focus();
+    });
+
+    reactionsBox.appendChild(span);
+    userReaction = span;
+
     input.value = "";
   });
 </script>
